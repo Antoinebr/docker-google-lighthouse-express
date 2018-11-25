@@ -1,0 +1,21 @@
+{
+  "name": "docker-google-lighthouse-express-app",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "moment": "^2.22.2",
+    "mysql2": "^1.6.4",
+    "sequelize": "^4.41.2",
+    "validator": "^10.9.0"
+  }
+}
