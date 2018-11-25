@@ -4,7 +4,20 @@ An API to run LightHouse test and block requests ( WIP )
 
 ## How to start
 
+### Build the image 
+ 
+``` bash BUILD.sh ```
+
+Make the /report folder is writable 
+
+``` bash RUN.sh ```
+
+This will work but generate error because the Database is missing, to install the db use the ```docker-compose```
+
+
+
 create a ```docker-compose.yml```
+
 
 ```yml
 db:
@@ -99,8 +112,7 @@ Returns :
 ### Get the reports 
 
 ```
-curl -X GET \
-  'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-13-47.blocked.report.html'
+curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-13-47.blocked.report.html'
 ```
 
 Returns an HTML file
