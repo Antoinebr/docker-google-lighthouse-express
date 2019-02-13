@@ -6,11 +6,11 @@ An API to run LightHouse test and block requests ( WIP )
 
 ### Build the image 
  
-``` bash BUILD.sh ```
+```Make build```
 
 Make the /report folder is writable 
 
-``` bash RUN.sh ```
+```Make run ```
 
 This will work but generate error because the Database is missing, to install the db use the ```docker-compose```
 
@@ -46,7 +46,7 @@ Run  ```docker-compose up```
 
 ## API
 
-All the original tests are cached for 60min ( we keep track of this with the database )
+If you use the DB ll the original tests are cached for 60min ( we keep track of this with the database )
 
 ### Run a test
 
