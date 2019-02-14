@@ -8,11 +8,22 @@ An API to run LightHouse test and block requests ( WIP )
  
 ```Make build```
 
-Make the /report folder is writable 
+
+### Make the report folder writable 
+
+Make the sure the ```/report``` folder is writable. 
+When LightHouse saves a test the result has to be saved on your machine.
+By default the folder used for saving tests is ```/report``` relative to where you clonned the project.
+
+### Run the image
 
 ```Make run ```
 
-This will work but generate error because the Database is missing, to install the db use the ```docker-compose```
+The image should run on port ```3000```
+
+### Errors in the Docker logs :
+
+By default the image work but generate errors because the Database is missing, to install the db use the ```docker-compose```
 
 
 
@@ -116,3 +127,10 @@ curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-
 ```
 
 Returns an HTML file
+
+
+## Todo 
+
+- [ ] Make the DataBase optional
+- [ ] Create an endpoint to get all the reports
+- [ ] Create more settings possibility with by using the [JSON config file](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md)
