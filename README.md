@@ -12,6 +12,9 @@ An API to run LightHouse test and block requests ( WIP )
 ### Make the report folder writable 
 
 Make the sure the ```/report``` folder is writable. 
+
+```chmod 777 -R /report``` 
+
 When LightHouse saves a test the result has to be saved on your machine.
 By default the folder used for saving tests is ```/report``` relative to where you clonned the project.
 
