@@ -1,12 +1,6 @@
-const {
-    exec
-} = require('child_process');
-
-const {
-    promisify
-} = require('util');
-
-const execPromise = promisify(exec);
+const lighthouse = require('lighthouse');
+const chromeLauncher = require('chrome-launcher');
+const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator');
 
 const {
     URL
@@ -14,8 +8,7 @@ const {
 
 const validator = require('validator');
 const utils = require('../utils/utils');
-const Test = require('../models/Test');
-const testCtrl = require('../controllers/testCtrl')
+const fs = require('fs');
 
 
 
@@ -88,32 +81,88 @@ const createReportName = (url, suffix = "") => {
 
 
 /**
+ * launchChromeAndRunLighthouse
+ * 
+ * @param {string} url 
+ * @param {object} opts 
+ * @param {object} config 
+ */
+const launchChromeAndRunLighthouse = (url, opts, config = null) => {
+    return chromeLauncher.launch({
+        chromeFlags: opts.chromeFlags
+    }).then(chrome => {
+        opts.port = chrome.port;
+        return lighthouse(url, opts, config).then(results => {
+            // use results.lhr for the JS-consumeable output
+            // https://github.com/GoogleChrome/lighthouse/blob/master/types/lhr.d.ts
+            // use results.report for the HTML/JSON/CSV output as a string
+            // use results.artifacts for the trace/screenshots/other specific case you need (rarer)
+            return chrome.kill().then(() => results)
+        });
+    });
+}
+
+
+/**
  * runLightHouseTest
  * 
  * @param {string} url 
- * @param {string} flags 
+ * @param {array} blockedUrlPatterns 
  */
-const runLightHouseTest = async (url, flags = "") => {
+const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
-    const suffix = flags === "" ? ".original" : ".blocked";
+    // if blockedUrlPatterns contains items
+    const suffix = blockedUrlPatterns.length === 0 ? ".original" : ".blocked";
 
-    const responseFromDocker = await execPromise(`lighthouse --enable-error-reporting --chrome-flags="--no-sandbox --headless --disable-gpu" ${url} --output-path=/home/chrome/reports/${createReportName(url,suffix)} --output json --output html ${flags} `);
+    const options = {
+        blockedUrlPatterns,
+        chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu']
+    };
 
     const status = {};
 
-    const match = responseFromDocker.stderr.match("\/home\/.*.html")[0];
+    try {
 
-    if (match) {
+        const results = await launchChromeAndRunLighthouse(url, options);
+
+        // results.report contain the results in JSON
+
+        console.log('result : ',typeof results);
+
+       const parsedResult = JSON.parse(results.report);
+                         
+        if(parsedResult.runtimeError.code !== "NO_ERROR"){
+
+            throw new Error(`${parsedResult.runtimeError.code} - ${parsedResult.runtimeError.message}`)
+        }
+
+        // we create the HTML 
+        const html = ReportGenerator.generateReport(results.lhr, 'html')
+
         status.ok = true;
-        status.report = match.replace('/home/chrome/reports/', '');
-        status.reportJSON = status.report.replace('.html', '.json');
 
-    } else {
+        // save the oupiut in process.env.REPORTS_PATH
+        
+        // we create the report names
+        const htmlName = createReportName(url,`${suffix}.html`)
+        const jsonName = createReportName(url,`${suffix}.json`);
+
+        // Let's save the files 
+        fs.writeFileSync(`${process.env.REPORTS_PATH}${jsonName}`,results.report);
+        fs.writeFileSync(`${process.env.REPORTS_PATH}${htmlName}`,html);
+
+        status.report = htmlName;
+        status.reportJSON = jsonName;
+
+    } catch (error) {
+
         status.ok = false;
-        status.message = responseFromDocker;
+        status.message = error.toString();
+
     }
 
     return status;
+
 };
 
 
@@ -134,32 +183,13 @@ exports.runOriginalTest = async (req, res) => {
 
     try {
 
-        // look for a recent test 
-        let originalTest = null;
-
-        const recentTest = await testCtrl.lookForRecentTest(url).catch(e => {
-            console.log('[DB] error when checking the recent test in the DB', e);
-        });
-
-        // if there's a recent test we put it in originalTest variable
-        if (recentTest) originalTest = recentTest;
-        // if there's NO recent test we put a promise in originalTest variable
-        else originalTest = runLightHouseTest(url);
-
-        const originalTestResult = await originalTest;
-
-        // save the res in the db 
-        if (!recentTest) {
-            testCtrl.createAtest({
-                url,
-                type: "original",
-                report: originalTestResult.report,
-                reportJSON: originalTestResult.reportJSON
-            });
-
-        }
+        const originalTestResult = await runLightHouseTest(url);
 
         console.log(`[LightHouse] ${utils.now()} Tests finished`)
+
+        if( !originalTestResult.ok ){
+            return res.status(500).json(originalTestResult)
+        }
 
         return res.json({
             originalTestResult
@@ -184,53 +214,22 @@ exports.runTests = async (req, res) => {
         blockedRequests,
     } = req.body;
 
-    let flags = "";
-
-    if (blockedRequests) {
-        flags = blockedRequests.map(e => `--blocked-url-patterns=${e}`).join(' ');
-    }
-
+ 
     console.log(`[LightHouse] ${utils.now()} starting the tests....`);
 
 
-    /*
-    Test if the original LightHouse test exists in the DB 
-    Check if the test is recent ( 1H )
-    */
-    let originalTest = null;
-
-    const recentTest = await testCtrl.lookForRecentTest(url).catch(e => {
-        console.log('[DB] error when checking the recent test in the DB', e);
-    });
-
-
-    if (recentTest) originalTest = recentTest;
-    else originalTest = runLightHouseTest(url);
-
-
-    const blockedTest = runLightHouseTest(url, flags);
-
     try {
 
+        const originalTestResult = await runLightHouseTest(url);
+
+        const blockedTestResult = await runLightHouseTest(url, blockedRequests);
+
         // even if originalTest is an object and not a Promise it will resolve
-        const [originalTestResult, blockedTestResult] = await Promise.all([originalTest, blockedTest]);
+        //const [originalTestResult, blockedTestResult] = await Promise.all([originalTest, blockedTest]);
 
         if (!originalTestResult.ok) throw new Error(originalTestResult.message)
 
         if (!blockedTestResult.ok) throw new Error(blockedTestResult.message)
-
-
-        // store the original test in the db only if it's a brand new test 
-        if (!recentTest) {
-
-            testCtrl.createAtest({
-                url,
-                type: "original",
-                report: originalTestResult.report,
-                reportJSON: originalTestResult.reportJSON
-            });
-
-        }
 
 
         console.log(`[LightHouse] ${utils.now()} Tests finished`)

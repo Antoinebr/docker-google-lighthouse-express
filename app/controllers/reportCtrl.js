@@ -6,7 +6,7 @@ exports.getReport = (req,res) => {
 
     try {
 
-        const html = fs.readFileSync(`/home/chrome/reports/${req.query.report}`);
+        const html = fs.readFileSync(`${process.env.REPORTS_PATH}${req.query.report}`);
 
         res.send(html.toString());
 

@@ -8,7 +8,6 @@ An API to run LightHouse test and block requests ( WIP )
  
 ```Make build```
 
-
 ### Make the report folder writable 
 
 Make the sure the ```/report``` folder is writable. 
@@ -24,39 +23,6 @@ By default the folder used for saving tests is ```/report``` relative to where y
 
 The image should run on port ```3000```
 
-### Errors in the Docker logs :
-
-By default the image work but generate errors because the Database is missing, to install the db use the ```docker-compose```
-
-
-
-create a ```docker-compose.yml```
-
-
-```yml
-db:
-  image: mariadb
-  ports:
-    - 3304:3306
-  volumes:
-    - "./data/:/var/lib/mysql"
-  environment: 
-    MYSQL_ROOT_PASSWORD: yourPassword
-
-lightHouse:
-  image: antoine/docker-lighthouse-express
-  links:
-    - db:mysql
-  ports:
-    - 3000:3498
-  cap_add:
-    - SYS_ADMIN
-  volumes:
-    - /Users/yourUserName/Documents/report:/home/chrome/reports
-
-```
-
-Run  ```docker-compose up```
 
 ## API
 
@@ -66,7 +32,7 @@ If you use the DB ll the original tests are cached for 60min ( we keep track of 
 
 ```bash
 curl -X POST \
-  http://localhost:3000/runOriginalTest \
+  http://localhost:3008/runOriginalTest \
   -H 'Content-Type: application/json' \
   -d '{
 	"url": "https://google.com/"
@@ -130,6 +96,17 @@ curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-
 ```
 
 Returns an HTML file
+
+
+## Dev 
+
+create a ```variables.env``` file in ``app````
+
+set the ```REPORTS_PATH``` :
+
+````
+REPORTS_PATH=/Users/abrossault/Documents/code/playground/docker-LightHouse/docker-google-lighthouse-express/report/
+````
 
 
 ## Todo 

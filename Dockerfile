@@ -27,7 +27,6 @@ RUN apt-get update && apt-get install -y \
 	--no-install-recommends \
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install -y nodejs \
-    && npm install lighthouse -g \
 	&& apt-get purge --auto-remove -y curl gnupg \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -52,7 +51,11 @@ USER chrome
 
 VOLUME /home/chrome/reports
 
+ENV REPORTS_PATH="/home/chrome/reports/"
+
 # Drop to cli
 #ENTRYPOINT ["entrypoint"]
 #RUN node /usr/src/app/app.js &
-CMD [ "node", "/usr/src/app/app.js" ]
+CMD [ "node", "/usr/src/app/start.js" ]
+#CMD ["bash"]
+#CMD tail -f /dev/null
