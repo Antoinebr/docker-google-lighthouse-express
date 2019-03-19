@@ -46,7 +46,7 @@ describe('Test the LightHouse endpoints', () => {
 
     it('should return a test result', async () => {
 
-        const response = await request(app)
+        await request(app)
         .post('/runOriginalTest')
         .send({url: 'https://google.com/'})
         .expect(200);
@@ -56,7 +56,7 @@ describe('Test the LightHouse endpoints', () => {
 
     it('should return a test result even with a slow page', async () => {
 
-        const response = await request(app)
+        await request(app)
         .post('/runOriginalTest')
         .send({url: 'https://www.landrover.ie/range-rover-velar'})
         .expect(200);
@@ -74,6 +74,33 @@ describe('Test the LightHouse endpoints', () => {
     });
 
 
-    
 
+    it('should run a test and block requests', async () => {
+
+        await request(app)
+        .post('/runtest')
+        .send({
+            url: "https://monbraceletnato.fr/",
+            blockedRequests: ["zopim.com","google-analytics.com","facebook.net"]
+        })
+        .expect(200);
+
+    });
+
+
+
+    it("should send an error with a 500 status when we hit a 404", async () => {
+
+        await request(app)
+        .post('/runtest')
+        .send({
+            url: "https://monbracelfddffddffdfdddfdfetnato.fr/",
+            blockedRequests: ["zopim.com","google-analytics.com","facebook.net"]
+        })
+        .expect(500);
+
+    });
+
+
+    
 });

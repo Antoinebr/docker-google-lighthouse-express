@@ -1,8 +1,8 @@
-
 const fs = require('fs');
+const fg = require('fast-glob');
 
 
-exports.getReport = (req,res) => {
+exports.getReport = (req, res) => {
 
     try {
 
@@ -17,4 +17,26 @@ exports.getReport = (req,res) => {
         });
 
     }
+}
+
+
+exports.getAllReports = async (req, res) => {
+
+    try {
+
+        let entries = await fg([`${process.env.REPORTS_PATH}*`]);
+
+        entries = entries.map( e => e.replace(process.env.REPORTS_PATH,''));
+
+        res.json(entries)
+
+
+    } catch ( e ) {
+
+        return res.status(500).json({
+            error: e.toString()
+        });
+    }
+    
+
 }

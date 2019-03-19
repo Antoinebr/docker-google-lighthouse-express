@@ -21,6 +21,7 @@ app.use(bodyParser.urlencoded({
 app.post("/runtest", ligthHouseCtrl.validateParams, ligthHouseCtrl.mocking, ligthHouseCtrl.runTests);
 app.post("/runOriginalTest", ligthHouseCtrl.validateParams, ligthHouseCtrl.runOriginalTest);
 app.get('/report/', reportCtrl.getReport);
+app.get('/reports/', reportCtrl.getAllReports);
 
 
 module.exports = app;

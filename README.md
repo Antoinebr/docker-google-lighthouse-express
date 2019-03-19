@@ -26,7 +26,6 @@ The image should run on port ```3000```
 
 ## API
 
-If you use the DB ll the original tests are cached for 60min ( we keep track of this with the database )
 
 ### Run a test
 
@@ -91,6 +90,14 @@ Returns :
 
 ### Get the reports 
 
+Get all reports : 
+
+```
+curl -X GET  'http://localhost:3498/reports/'
+```
+
+Get a specific report : 
+
 ```
 curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-13-47.blocked.report.html'
 ```
@@ -111,6 +118,4 @@ REPORTS_PATH=/Users/abrossault/Documents/code/playground/docker-LightHouse/docke
 
 ## Todo 
 
-- [ ] Make the DataBase optional
-- [ ] Create an endpoint to get all the reports
 - [ ] Create more settings possibility with by using the [JSON config file](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md)
