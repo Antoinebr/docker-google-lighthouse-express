@@ -126,9 +126,6 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
         const results = await launchChromeAndRunLighthouse(url, options);
 
         // results.report contain the results in JSON
-
-        console.log('result : ',typeof results);
-
        const parsedResult = JSON.parse(results.report);
                          
         if(parsedResult.runtimeError.code !== "NO_ERROR"){
