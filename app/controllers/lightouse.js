@@ -116,7 +116,7 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
     const options = {
         blockedUrlPatterns,
-        chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu']
+        chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu','--max-wait-for-load 20000']
     };
 
     const status = {};
