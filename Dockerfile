@@ -58,4 +58,4 @@ ENV REPORTS_PATH="/home/chrome/reports/"
 #RUN node /usr/src/app/app.js &
 CMD [ "node", "/usr/src/app/start.js" ]
 #CMD ["bash"]
-#CMD tail -f /dev/null
+
