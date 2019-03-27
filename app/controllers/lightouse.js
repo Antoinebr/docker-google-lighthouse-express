@@ -28,9 +28,9 @@ exports.validateParams = (req, res, next) => {
         return res.status(400).send('400 : Missformed request ! Url param is missing');
     }
 
-    if (!validator.isURL(url)) {
-        return res.status(400).send('400 : Missformed request ! url is not a valid');
-    }
+    // if (!validator.isURL(url)) {
+    //     return res.status(400).send('400 : Missformed request ! url is not a valid');
+    // }
 
     return next();
 }
@@ -81,31 +81,37 @@ const createReportName = (url, suffix = "") => {
 
 
 /**
- * launchChromeAndRunLighthouse
- * 
+ * @name launchChromeAndRunLighthouse
+ * @description start a Google Chrome insta,ce and run LightHouse 
  * @param {string} url 
  * @param {object} opts 
  * @param {object} config 
  */
-const launchChromeAndRunLighthouse = (url, opts, config = null) => {
-    return chromeLauncher.launch({
+const launchChromeAndRunLighthouse = async (url, opts, config = null) => {
+    
+    const chrome = await chromeLauncher.launch({
         chromeFlags: opts.chromeFlags
-    }).then(chrome => {
-        opts.port = chrome.port;
-        return lighthouse(url, opts, config).then(results => {
-            // use results.lhr for the JS-consumeable output
-            // https://github.com/GoogleChrome/lighthouse/blob/master/types/lhr.d.ts
-            // use results.report for the HTML/JSON/CSV output as a string
-            // use results.artifacts for the trace/screenshots/other specific case you need (rarer)
-            return chrome.kill().then(() => results)
-        });
     });
+    
+    opts.port = chrome.port; 
+
+    const results = await lighthouse(url, opts, config);
+
+    await chrome.kill();
+    
+
+    // use results.lhr for the JS-consumeable output
+    // https://github.com/GoogleChrome/lighthouse/blob/master/types/lhr.d.ts
+    // use results.report for the HTML/JSON/CSV output as a string
+    // use results.artifacts for the trace/screenshots/other specific case you need (rarer)
+            
+    return results;
+
 }
 
 
 /**
- * runLightHouseTest
- * 
+ * @name runLightHouseTest
  * @param {string} url 
  * @param {array} blockedUrlPatterns 
  */
@@ -165,9 +171,8 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
 
 /**
- * runOriginalTest
- * 
- * Runs a LightHouse test to be used as a reference
+ * @name runOriginalTest
+ * @description Runs a LightHouse test to be used as a reference
  */
 exports.runOriginalTest = async (req, res) => {
 
