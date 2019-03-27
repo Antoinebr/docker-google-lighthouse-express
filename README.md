@@ -113,7 +113,7 @@ Returns a JSON
 
 ## Dev 
 
-create a ```variables.env``` file in ``app````
+create a ```variables.env``` file in ```app```
 
 set the ```REPORTS_PATH``` :
 
