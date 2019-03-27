@@ -58,7 +58,7 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
 	"url": "https://google.com/",
-	  "blockedRequests": [
+	"blockedRequests": [
         "netmng.com",
         "googleadservices.com",
         "google-analytics.com",
@@ -96,13 +96,19 @@ Get all reports :
 curl -X GET  'http://localhost:3498/reports/'
 ```
 
-Get a specific report : 
+Get a specific report HTML format: 
 
 ```
 curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-13-47.blocked.report.html'
 ```
 
-Returns an HTML file
+Returns an HTML file JSON format :
+
+```
+curl -X GET 'http://localhost:3000/report/?report=www.google.com_2018-11-25__16-13-47.blocked.report.json'
+```
+
+Returns a JSON
 
 
 ## Dev 
@@ -115,6 +121,9 @@ set the ```REPORTS_PATH``` :
 REPORTS_PATH=/Users/abrossault/Documents/code/playground/docker-LightHouse/docker-google-lighthouse-express/report/
 ````
 
+### Run the tests
+
+cd ```app/``` ```npm run test```
 
 ## Todo 
 
