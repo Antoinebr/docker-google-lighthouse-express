@@ -28,9 +28,9 @@ exports.validateParams = (req, res, next) => {
         return res.status(400).send('400 : Missformed request ! Url param is missing');
     }
 
-    // if (!validator.isURL(url)) {
-    //     return res.status(400).send('400 : Missformed request ! url is not a valid');
-    // }
+    if (!validator.isURL(url)) {
+        return res.status(400).send('400 : Missformed request ! url is not a valid');
+    }
 
     return next();
 }
