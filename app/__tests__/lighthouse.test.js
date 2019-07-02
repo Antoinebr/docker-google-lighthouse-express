@@ -102,5 +102,32 @@ describe('Test the LightHouse endpoints', () => {
     });
 
 
+    it("should continueto run even after a LightHouse error", async () => {
+
+        await request(app)
+        .post('/runtest')
+        .send({url: "https://www.sportscheck.com/jacken/damen/"})
+        .expect(500);
+    });
+
+    it("Should work after a timeout", async () => {
     
+        await request(app)
+        .post('/runtest')
+        .send({url: 'https://google.com/'})
+        .expect(200);
+
+    });
+
+
+    it("should return a timeout during precheck", async () => {
+
+        const body = await request(app)
+        .post('/runtest')
+        .send({url: "https://www.sportscheck.com/jacken/damen/"})
+        .expect(500)
+        
+
+    });
+
 });

@@ -14,12 +14,13 @@
     "cors": "^2.8.5",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
+    "fast-glob": "^2.2.6",
     "lighthouse": "^4.1.0",
     "moment": "^2.22.2",
     "mysql2": "^1.6.4",
+    "node-fetch": "^2.6.0",
     "sequelize": "^4.41.2",
-    "validator": "^10.9.0",
-    "fast-glob": "^2.2.6"
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "jest": "^24.3.0",

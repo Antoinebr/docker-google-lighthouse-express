@@ -9,7 +9,7 @@ const {
 const validator = require('validator');
 const utils = require('../utils/utils');
 const fs = require('fs');
-
+const fetch = require('node-fetch');
 
 
 /**
@@ -88,23 +88,32 @@ const createReportName = (url, suffix = "") => {
  * @param {object} config 
  */
 const launchChromeAndRunLighthouse = async (url, opts, config = null) => {
-    
+
+    console.log(`[LightHouse precheck] pending for ${url}...`);
+
+    await utils.timeout(6000, fetch(url)).catch(error => {
+
+        throw new Error(`[LightHouse precheck] failure by  ${error === "timeout" ? 'timeout' : ''}`);
+    });
+
+    console.log(`[LightHouse precheck] PASSED for ${url}...`);
+
     const chrome = await chromeLauncher.launch({
         chromeFlags: opts.chromeFlags
     });
-    
-    opts.port = chrome.port; 
+
+    opts.port = chrome.port;
 
     const results = await lighthouse(url, opts, config);
 
     await chrome.kill();
-    
+
 
     // use results.lhr for the JS-consumeable output
     // https://github.com/GoogleChrome/lighthouse/blob/master/types/lhr.d.ts
     // use results.report for the HTML/JSON/CSV output as a string
     // use results.artifacts for the trace/screenshots/other specific case you need (rarer)
-            
+
     return results;
 
 }
@@ -122,7 +131,7 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
     const options = {
         blockedUrlPatterns,
-        chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu','--max-wait-for-load 20000']
+        chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu', '--max-wait-for-load 20000']
     };
 
     const status = {};
@@ -132,9 +141,9 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
         const results = await launchChromeAndRunLighthouse(url, options);
 
         // results.report contain the results in JSON
-       const parsedResult = JSON.parse(results.report);
-                         
-        if(parsedResult.runtimeError.code !== "NO_ERROR"){
+        const parsedResult = JSON.parse(results.report);
+
+        if (parsedResult.runtimeError.code !== "NO_ERROR") {
 
             throw new Error(`${parsedResult.runtimeError.code} - ${parsedResult.runtimeError.message}`)
         }
@@ -145,14 +154,14 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
         status.ok = true;
 
         // save the oupiut in process.env.REPORTS_PATH
-        
+
         // we create the report names
-        const htmlName = createReportName(url,`${suffix}.html`)
-        const jsonName = createReportName(url,`${suffix}.json`);
+        const htmlName = createReportName(url, `${suffix}.html`)
+        const jsonName = createReportName(url, `${suffix}.json`);
 
         // Let's save the files 
-        fs.writeFileSync(`${process.env.REPORTS_PATH}${jsonName}`,results.report);
-        fs.writeFileSync(`${process.env.REPORTS_PATH}${htmlName}`,html);
+        fs.writeFileSync(`${process.env.REPORTS_PATH}${jsonName}`, results.report);
+        fs.writeFileSync(`${process.env.REPORTS_PATH}${htmlName}`, html);
 
         status.report = htmlName;
         status.reportJSON = jsonName;
@@ -189,7 +198,7 @@ exports.runOriginalTest = async (req, res) => {
 
         console.log(`[LightHouse] ${utils.now()} Tests finished`)
 
-        if( !originalTestResult.ok ){
+        if (!originalTestResult.ok) {
             return res.status(500).json(originalTestResult)
         }
 
@@ -216,7 +225,7 @@ exports.runTests = async (req, res) => {
         blockedRequests,
     } = req.body;
 
- 
+
     console.log(`[LightHouse] ${utils.now()} starting the tests....`);
 
 
