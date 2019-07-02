@@ -89,11 +89,11 @@ const createReportName = (url, suffix = "") => {
  */
 const launchChromeAndRunLighthouse = async (url, opts, config = null) => {
 
-    console.log(`[LightHouse precheck] pending for ${url}...`);
+    console.log(`[LightHouse precheck] PENDING for ${url}...`);
 
     await utils.timeout(6000, fetch(url)).catch(error => {
 
-        throw new Error(`[LightHouse precheck] failure by  ${error === "timeout" ? 'timeout' : ''}`);
+        throw new Error(`[LightHouse precheck] failure by timeout`);
     });
 
     console.log(`[LightHouse precheck] PASSED for ${url}...`);
