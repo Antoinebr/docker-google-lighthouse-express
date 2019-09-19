@@ -51,13 +51,13 @@ exports.mocking = (req, res, next) => {
         return res.json({
             "originalTestResult": {
                 "ok": true,
-                "report": "www.activis.net_2018-11-24__17-04-47.original.report.html",
-                "reportJSON": "www.activis.net_2018-11-24__17-04-47.original.report.json"
+                "report": "www.random.net_2018-11-24__17-04-47.original.report.html",
+                "reportJSON": "www.random.net_2018-11-24__17-04-47.original.report.json"
             },
             "blockedTestResult": {
                 "ok": true,
-                "report": "www.activis.net_2018-11-24__17-04-47.blocked.report.html",
-                "reportJSON": "www.activis.net_2018-11-24__17-04-47.blocked.report.json"
+                "report": "www.random.net_2018-11-24__17-04-47.blocked.report.html",
+                "reportJSON": "www.random.net_2018-11-24__17-04-47.blocked.report.json"
             }
         });
     }
@@ -131,14 +131,6 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
         const results = await launchChromeAndRunLighthouse(url, options);
 
-        // results.report contain the results in JSON
-       const parsedResult = JSON.parse(results.report);
-                         
-        if(parsedResult.runtimeError.code !== "NO_ERROR"){
-
-            throw new Error(`${parsedResult.runtimeError.code} - ${parsedResult.runtimeError.message}`)
-        }
-
         // we create the HTML 
         const html = ReportGenerator.generateReport(results.lhr, 'html')
 
@@ -161,6 +153,8 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
 
         status.ok = false;
         status.message = error.toString();
+
+        utils.dumpError(error);
 
     }
 
@@ -244,6 +238,8 @@ exports.runTests = async (req, res) => {
     } catch (error) {
 
         console.log(`[LightHouse] ${utils.now()} Something wrong happpend ${error}`)
+
+        utils.dumpError(error);
 
         return res.status(500).send(error.toString());
     }

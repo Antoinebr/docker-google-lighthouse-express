@@ -31,7 +31,7 @@ The image should run on port ```3000```
 
 ```bash
 curl -X POST \
-  http://localhost:3008/runOriginalTest \
+  http://localhost:3000/runOriginalTest \
   -H 'Content-Type: application/json' \
   -d '{
 	"url": "https://google.com/"
@@ -93,7 +93,7 @@ Returns :
 Get all reports : 
 
 ```
-curl -X GET  'http://localhost:3498/reports/'
+curl -X GET  'http://localhost:300/reports/'
 ```
 
 Get a specific report HTML format: 

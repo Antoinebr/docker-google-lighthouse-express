@@ -6,6 +6,8 @@ qemu-*-static
 node_modules/
 
 *.log
+
+app/*.log
 variables.env
 variables.env.now
 

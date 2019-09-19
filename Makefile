@@ -1,6 +1,9 @@
 build:
 	docker build -t antoine/docker-lighthouse-express . --force-rm;
 
+build-no-cache:
+	docker build --no-cache  -t antoine/docker-lighthouse-express . --force-rm;
+
 run:
 	docker run -d \
 	-p 3000:3498 -it \
