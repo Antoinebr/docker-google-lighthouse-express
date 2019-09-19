@@ -29,7 +29,7 @@ The image should run on port ```3000```
 
 ### Run a test
 
-```bash
+```JSON
 curl -X POST \
   http://localhost:3000/runOriginalTest \
   -H 'Content-Type: application/json' \
@@ -52,7 +52,7 @@ Returns :
 
 ### Run a test and block requests
 
-```bash
+```JSON
 curl -X POST \
   http://localhost:3000/runtest \
   -H 'Content-Type: application/json' \
@@ -83,6 +83,127 @@ Returns :
         "ok": true,
         "report": "www.google.com_2018-11-25__16-13-47.blocked.report.html",
         "reportJSON": "www.google.com_2018-11-25__16-13-47.blocked.report.json"
+    }
+}
+```
+
+
+### Run a test and set a performance budget
+
+```JSON
+curl -X POST \
+  http://localhost:3000/runOriginalTest \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "url": "https://google.fr/",
+    "budgets": [
+        {
+            "resourceCounts": [
+                {
+                    "resourceType": "total",
+                    "budget": 8
+                },
+                {
+                    "resourceType": "stylesheet",
+                    "budget": 1
+                },
+                {
+                    "resourceType": "image",
+                    "budget": 1
+                },
+                {
+                    "resourceType": "media",
+                    "budget": 0
+                },
+                {
+                    "resourceType": "font",
+                    "budget": 2
+                },
+                {
+                    "resourceType": "script",
+                    "budget": 1
+                },
+                {
+                    "resourceType": "document",
+                    "budget": 0
+                },
+                {
+                    "resourceType": "other",
+                    "budget": 1
+                },
+                {
+                    "resourceType": "third-party",
+                    "budget": 0
+                }
+            ],
+            "resourceSizes": [
+                {
+                    "resourceType": "total",
+                    "budget": 100
+                },
+                {
+                    "resourceType": "stylesheet",
+                    "budget": 0
+                },
+                {
+                    "resourceType": "image",
+                    "budget": 30
+                },
+                {
+                    "resourceType": "media",
+                    "budget": 0
+                },
+                {
+                    "resourceType": "font",
+                    "budget": 75
+                },
+                {
+                    "resourceType": "script",
+                    "budget": 30
+                },
+                {
+                    "resourceType": "document",
+                    "budget": 1
+                },
+                {
+                    "resourceType": "other",
+                    "budget": 2
+                },
+                {
+                    "resourceType": "third-party",
+                    "budget": 0
+                }
+            ],
+            "timings": [
+                {
+                    "metric": "first-contentful-paint",
+                    "budget": 2000,
+                    "tolerance": 100
+                },
+                {
+                    "metric": "first-cpu-idle",
+                    "budget": 2000,
+                    "tolerance": 100
+                },
+                {
+                    "metric": "interactive",
+                    "budget": 2000,
+                    "tolerance": 100
+                }
+            ]
+        }
+    ]
+}'
+```
+
+Returns : 
+
+```json
+{
+    "originalTestResult": {
+        "ok": true,
+        "report": "google.fr_2019-09-19__13-47-36.original.html",
+        "reportJSON": "google.fr_2019-09-19__13-47-36.original.json"
     }
 }
 ```

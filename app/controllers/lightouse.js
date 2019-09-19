@@ -87,8 +87,15 @@ const createReportName = (url, suffix = "") => {
  * @param {object} opts 
  * @param {object} config 
  */
-const launchChromeAndRunLighthouse = async (url, opts, config = null) => {
+const launchChromeAndRunLighthouse = async (url, opts, budgets = null) => {
     
+    config = {
+        extends: 'lighthouse:default',
+        settings: {
+          budgets,
+        },
+      };
+
     const chrome = await chromeLauncher.launch({
         chromeFlags: opts.chromeFlags
     });
@@ -115,7 +122,7 @@ const launchChromeAndRunLighthouse = async (url, opts, config = null) => {
  * @param {string} url 
  * @param {array} blockedUrlPatterns 
  */
-const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
+const runLightHouseTest = async (url, blockedUrlPatterns = [], budget = null) => {
 
     // if blockedUrlPatterns contains items
     const suffix = blockedUrlPatterns.length === 0 ? ".original" : ".blocked";
@@ -125,11 +132,12 @@ const runLightHouseTest = async (url, blockedUrlPatterns = []) => {
         chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu','--max-wait-for-load 20000']
     };
 
+
     const status = {};
 
     try {
 
-        const results = await launchChromeAndRunLighthouse(url, options);
+        const results = await launchChromeAndRunLighthouse(url, options,budget);
 
         // we create the HTML 
         const html = ReportGenerator.generateReport(results.lhr, 'html')
@@ -172,14 +180,16 @@ exports.runOriginalTest = async (req, res) => {
 
     // get the url 
     const {
-        url
+        url,
+        budgets
     } = req.body;
+
 
     console.log(`[LightHouse] ${utils.now()} starting the tests....`);
 
     try {
 
-        const originalTestResult = await runLightHouseTest(url);
+        const originalTestResult = await runLightHouseTest(url,[],budgets);
 
         console.log(`[LightHouse] ${utils.now()} Tests finished`)
 
