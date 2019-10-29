@@ -20,7 +20,7 @@
     "lighthouse": "^5.2.0",
     "moment": "^2.22.2",
     "mysql2": "^1.6.4",
-    "sequelize": "^4.41.2",
+    "sequelize": "^5.15.1",
     "validator": "^10.9.0"
   },
   "devDependencies": {
